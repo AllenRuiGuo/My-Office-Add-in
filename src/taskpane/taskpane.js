@@ -9,6 +9,7 @@ Office.onReady((info) => {
   if (info.host === Office.HostType.Excel) {
     // Assign event handlers and other initialization logic.
     document.getElementById("create-table").onclick = () => tryCatch(createTable);
+    document.getElementById("filter-table").onclick = () => tryCatch(filterTable);
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
   }
@@ -53,4 +54,18 @@ async function tryCatch(callback) {
       // Note: In a production add-in, you'd want to notify the user through your add-in's UI.
       console.error(error);
   }
+}
+
+async function filterTable() {
+  await Excel.run(async (context) => {
+
+    // TODO1: Queue commands to filter out all expense categories except
+    //        Groceries and Education.
+    const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+    const expensesTable = currentWorksheet.tables.getItem("ExpensesTable");
+    const categoryFilter = expensesTable.columns.getItem("Category").filter;
+    categoryFilter.applyValuesFilter(["Education", "Groceries"]);
+
+    await context.sync();
+  });
 }
